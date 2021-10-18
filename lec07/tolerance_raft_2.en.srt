@@ -984,194 +984,242 @@ to elect this leader right cool
 
 198
 00:10:08,830 --> 00:10:10,840
+你懂的 如果你看了论文的话
 you know that all right if you read the
 
 199
 00:10:10,840 --> 00:10:12,730
+不是随便哪个节点
 paper you know the answer is not just
 
 200
 00:10:12,730 --> 00:10:15,670
+事实上，这对正确性有很大的影响
 anyone it turns out it matters a lot for
 
 201
 00:10:15,670 --> 00:10:17,410
+系统的正确性使我们不允许任意的节点
 the correctness the correctness of the
 
 202
 00:10:17,410 --> 00:10:19,900
+系统的正确性使我们不允许任意的节点
 system that we don't allow just anyone
 
 203
 00:10:19,900 --> 00:10:21,670
+成为领导者 举例来说
 to be the leader like for example the
 
 204
 00:10:21,670 --> 00:10:24,610
+第一个节点的计时器结束时可能
 first node whose timer goes off may in
 
 205
 00:10:24,610 --> 00:10:28,150
+不是一个可接受的领导
 fact not be an acceptable leader and so
 
 206
 00:10:28,150 --> 00:10:29,800
+事实上，raft有一些规则
 it turns out raft has some rules that
 
 207
 00:10:29,800 --> 00:10:32,620
+关于你能成为领导
 applies about oh yes you can be leader
 
 208
 00:10:32,620 --> 00:10:35,440
+或你不能成为领导
 or you can't be leader and to see why
 
 209
 00:10:35,440 --> 00:10:37,000
+让我们拟定一个草案
 this is true let's sort of set up a
 
 210
 00:10:37,000 --> 00:10:43,090
+让我们拟定一个草案
 straw man proposal that maybe raft
 
 211
 00:10:43,090 --> 00:10:46,120
+raft可能使用日志最长的服务器作为领导
 should accept should use the server with
 
 212
 00:10:46,120 --> 00:10:49,210
+raft可能使用日志最长的服务器作为领导
 the longest log as the leader right you
 
 213
 00:10:49,210 --> 00:10:50,830
+你知道 在一些替代（平行）宇宙中可能是对的
 know some alternate universe that could
 
 214
 00:10:50,830 --> 00:10:52,420
+你知道 在一些替代（平行）宇宙中可能是对的
 be true and it is actually true in
 
 215
 00:10:52,420 --> 00:10:55,000
+而在其他设计系统中也确实是对的
 systems with different designs just not
 
 216
 00:10:55,000 --> 00:10:57,340
+但不适用于raft
 in raft so the question we're
 
 217
 00:10:57,340 --> 00:11:02,260
+我们正在研究的问题是
 investigating is why not use the
 
 218
 00:11:02,260 --> 00:11:09,910
-cervical longest law as leader and this
+为什么不能用日志最长的服务器作为领导
+server with longest log as leader and this
 
 219
 00:11:09,910 --> 00:11:11,710
+这将会涉及改变投票规则
 would involve changing the voting rules
 
 220
 00:11:11,710 --> 00:11:16,090
+这将会涉及改变投票规则
 in raft have a voters only vote for
 
 221
 00:11:16,090 --> 00:11:19,600
+即让选民只投票给有较长日志的节点
 nodes that have longer logs all right so
 
 222
 00:11:19,600 --> 00:11:21,610
+这个例子将便于说明为什么这是个坏主意
 the example that's going to be
 
 223
 00:11:21,610 --> 00:11:23,080
+这个例子将便于说明为什么这是个坏主意
 convenient for showing why this is a bad
 
 224
 00:11:23,080 --> 00:11:25,900
+所以，让我们想象一下，我们又有了三个服务器
 idea so let's imagine we have three
 
 225
 00:11:25,900 --> 00:11:29,980
+现在的日志集是这样的
 servers again and now the log set setups
 
 226
 00:11:29,980 --> 00:11:34,360
-are server Wan has entries for terms
+服务器一有任期五、六、七的条目
+are server one has entries for terms
 
 227
 00:11:34,360 --> 00:11:38,530
+服务器二有任期四、五、八的条目
 five six and seven server two four five
 
 228
 00:11:38,530 --> 00:11:41,950
+服务器三也有四、五、八的条目
 and eight and server three also four
 
 229
 00:11:41,950 --> 00:11:46,900
+服务器三也有四、五、八的条目
 five and eight that's the first question
 
 230
 00:11:46,900 --> 00:11:50,020
+这是第一个问题
 of course to avoid spending our time
 
 231
 00:11:50,020 --> 00:11:51,610
+为了避免我们花时间对完全无意义的事情抓破头
 scratching our heads about utter
 
 232
 00:11:51,610 --> 00:11:54,520
+我们要确保说服自己，这种配置确实可能出现
 nonsense is to make sure that convince
 
 233
 00:11:54,520 --> 00:11:56,320
+我们要确保说服自己，这种配置确实可能出现
 ourselves that this configuration could
 
 234
 00:11:56,320 --> 00:11:58,060
+因为如果它不可能出现的话
 actually arise because if it couldn't
 
 235
 00:11:58,060 --> 00:11:59,800
+因为如果它不可能出现的话
 possibly arise then
 
 236
 00:11:59,800 --> 00:12:01,390
+那么可能是在浪费时间去想如果真的发生了会怎样
 may be a waste of time to figure out
 
 237
 00:12:01,390 --> 00:12:03,760
+那么可能是在浪费时间去想如果真的发生了会怎样
 what would happen if it did arise so
 
 238
 00:12:03,760 --> 00:12:07,630
+有谁想要提出这组日志可能产生的事件序列吗？
 anybody wanna propose a sequence of
 
 239
 00:12:07,630 --> 00:12:10,779
+有谁想要提出这组日志可能产生的事件序列吗？
 events whereby this set of logs could
 
 240
 00:12:10,779 --> 00:12:17,140
+说它不可能出现的论点如何呢？
 have arisen how about an argument that
 
 241
 00:12:17,140 --> 00:12:27,160
+说它不可能出现的论点如何呢？
 it couldn't have arisen oh yeah okay so
 
 242
 00:12:27,160 --> 00:12:31,650
+也许我们会在某个时候备份
 well maybe we'll back up sometime
 
 243
 00:12:31,800 --> 00:12:34,450
+这时侯，服务器一赢得了选举，而且是在第六个任期。
 all right so server one wins is wins the
 
 244
 00:12:34,450 --> 00:12:37,150
+这时侯，服务器一赢得了选举，而且是在第六个任期。
 election at this point and it's in term
 
 245
 00:12:37,150 --> 00:12:42,520
+
 six sends out yeah it receives a client
 
 246
@@ -1180,10 +1228,12 @@ request sends out the first append
 
 247
 00:12:44,020 --> 00:12:52,900
+到目前为止一切都很好，没有什么问题
 entries and then that's fine actually
 
 248
 00:12:52,900 --> 00:12:56,160
+到目前为止一切都很好，没有什么问题
 everything's fine so far nothing's wrong
 
 249
